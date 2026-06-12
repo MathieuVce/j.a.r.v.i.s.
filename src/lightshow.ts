@@ -54,7 +54,7 @@ const AMBIANCES: Record<AmbianceKey, Ambiance> = {
 };
 
 const BAR_COUNT = 64;
-const P_COUNT = 5000;
+const P_COUNT = 2000;
 const JOY_DEAD = 0.1;
 const JOY_RANGE = 0.32;
 
@@ -191,12 +191,12 @@ export class LightShowWorld {
     // particules vivantes
     this.pPos = new Float32Array(P_COUNT * 3);
     for (let i = 0; i < P_COUNT; i++) {
-      this.pRad[i] = 30 + Math.random() * 55;
+      this.pRad[i] = 18 + Math.random() * 32;
       this.pTheta[i] = Math.random() * Math.PI * 2;
       this.pPhi[i] = Math.acos(2 * Math.random() - 1);
-      this.pSpeed[i] = 0.3 + Math.random() * 1.2;
-      this.pBaseX[i] = (Math.random() - 0.5) * 140;
-      this.pBaseZ[i] = (Math.random() - 0.5) * 140;
+      this.pSpeed[i] = 0.3 + Math.random() * 1.0;
+      this.pBaseX[i] = (Math.random() - 0.5) * 80;
+      this.pBaseZ[i] = (Math.random() - 0.5) * 80;
       this.pY[i] = -14 + Math.random() * 74;
     }
     const pGeo = new THREE.BufferGeometry();
@@ -205,9 +205,9 @@ export class LightShowWorld {
       pGeo,
       new THREE.PointsMaterial({
         color: 0x0e93a8,
-        size: 0.9,
+        size: 0.42,
         transparent: true,
-        opacity: 0.5,
+        opacity: 0.45,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
       }),
@@ -461,8 +461,8 @@ export class LightShowWorld {
   /** Trois comportements : tourbillon orbital, pluie, respiration radiale. */
   private animateParticles(dt: number, t: number, frame: AudioFrame): void {
     const pm = this.particles.material as THREE.PointsMaterial;
-    pm.size = 0.85 * (1 + frame.bass * 1.5);
-    pm.opacity = 0.35 + frame.high * 0.55;
+    pm.size = 0.42 * (1 + frame.bass * 0.9);
+    pm.opacity = 0.32 + frame.high * 0.42;
 
     const breathe = 1 + frame.bass * 0.35 + this.flashEnv * 0.15;
     for (let i = 0; i < P_COUNT; i++) {

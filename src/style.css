@@ -66,7 +66,9 @@ html, body {
   font-size: 13px;
   letter-spacing: 6px;
   color: var(--amber);
-  text-shadow: 0 0 8px var(--amber);
+  text-shadow: 0 0 8px var(--amber), 0 1px 4px rgba(0,0,0,0.8);
+  background: rgba(2, 6, 12, 0.45);
+  padding: 3px 12px;
 }
 
 #status {
@@ -89,8 +91,11 @@ html, body {
   transform: translateX(-50%);
   font-size: 11px;
   letter-spacing: 2px;
-  opacity: 0.55;
+  opacity: 0.82;
   white-space: nowrap;
+  background: rgba(2, 6, 12, 0.62);
+  padding: 5px 14px;
+  border: 1px solid rgba(46, 230, 255, 0.18);
 }
 
 /* ---- hand cursors ---- */
@@ -109,7 +114,7 @@ html, body {
   border-radius: 50%;
   border: 1.5px solid var(--cyan);
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 10px var(--cyan-dim), inset 0 0 10px var(--cyan-dim);
+  box-shadow: 0 0 10px var(--cyan-dim), inset 0 0 10px var(--cyan-dim), 0 0 0 1px rgba(0,0,0,0.5);
 }
 #cursor .r1 { width: 46px; height: 46px; animation: spin 6s linear infinite; border-style: dashed; }
 #cursor .r2 { width: 28px; height: 28px; }

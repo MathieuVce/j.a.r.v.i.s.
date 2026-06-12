@@ -1,5 +1,36 @@
+# dépendances
+node_modules/
+
+# build
+dist/
+dist-ssr/
+
+# Vite / cache
+.vite/
+*.local
+
+# environnement
+.env
+.env.*
+!.env.example
+
+# Vercel
+.vercel/
+
+# éditeurs
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
 .DS_Store
 Thumbs.db
-.env
-node_modules/
-.vercel
+*.log
+
+# TypeScript
+*.tsbuildinfo
