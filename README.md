@@ -1,10 +1,5 @@
 # J.A.R.V.I.S Holographic Interface
 
-Interface holographique 3D contrôlée par la reconnaissance des mains en temps réel.
-Inspirée de l'esthétique Jarvis d'Iron Man.
-
-Démo en ligne : **https://jarvis-lyart-tau.vercel.app**
-
 ![Three.js](https://img.shields.io/badge/Three.js-r170-black?style=flat&logo=threedotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?style=flat&logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=flat&logo=vite&logoColor=white)
@@ -15,6 +10,11 @@ Démo en ligne : **https://jarvis-lyart-tau.vercel.app**
 ![Vercel](https://img.shields.io/badge/Vercel-deployed-000000?style=flat&logo=vercel&logoColor=white)
 
 ---
+
+Interface holographique 3D contrôlée par la reconnaissance des mains en temps réel.
+Inspirée de l'esthétique Jarvis d'Iron Man.
+
+Démo en ligne : **https://jarvis-lyart-tau.vercel.app**
 
 ## Vue d'ensemble
 
