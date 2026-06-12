@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>J.A.R.V.I.S</title>
+    <script type="module" crossorigin src="/assets/index-Ddx4zhna.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-Dw_v7HWh.css">
+  </head>
+  <body>
+    <div id="cam-feed">
+      <video id="video" playsinline muted></video>
+      <canvas id="debug"></canvas>
+      <div class="cam-label">OPTICAL FEED</div>
+    </div>
+
+    <canvas id="scene"></canvas>
+
+    <!-- HUD -->
+    <div id="hud">
+      <div class="frame-corner tl"></div>
+      <div class="frame-corner tr"></div>
+      <div class="frame-corner bl"></div>
+      <div class="frame-corner br"></div>
+
+      <div id="title">J.A.R.V.I.S <span>// HOLOGRAPHIC INTERFACE v0.2</span></div>
+      <div id="mode-label">STANDBY</div>
+      <div id="status">INITIALIZING OPTICAL SENSORS…</div>
+      <div id="audio-hint">▶ CLIQUE N'IMPORTE OÙ POUR ACTIVER L'AUDIO</div>
+
+      <div id="world-controls">
+        <button id="world-toggle">MONDE&nbsp;:&nbsp;CARTE</button>
+        <button id="globe-back" class="hidden">◉ RETOUR GLOBE</button>
+      </div>
+
+      <div id="ls-panel" class="hidden">
+        <div class="ls-title">◉ AUDIO REACTOR</div>
+        <div class="ls-row">
+          <button id="ls-demo">SYNTH DEMO</button>
+          <button class="ls-track" data-name="PYRO FLOW — K. MACLEOD"
+            data-url="https://archive.org/download/Kevin-MacLeod_Vicious_2016_FullAlbum/Vicious/Kevin%20MacLeod%20-%2001%20-%20Pyro%20Flow.mp3">PYRO FLOW</button>
+          <button class="ls-track" data-name="VICIOUS — K. MACLEOD"
+            data-url="https://archive.org/download/Kevin-MacLeod_Vicious_2016_FullAlbum/Vicious/Kevin%20MacLeod%20-%2002%20-%20Vicious.mp3">VICIOUS</button>
+        </div>
+        <label id="ls-upload">⬆ UPLOADER MP3/WAV<input id="ls-file" type="file" accept="audio/*"></label>
+        <div class="ls-row" id="ls-ambs">
+          <button data-amb="neon" class="on">NÉON</button>
+          <button data-amb="space">SPACE</button>
+          <button data-amb="minimal">MINIMAL</button>
+        </div>
+        <div class="ls-row">
+          <button id="ls-mode">RYTHME&nbsp;:&nbsp;AUTO</button>
+          <button id="ls-pause">▶ LECTURE</button>
+        </div>
+        <div id="ls-now">AUCUNE PISTE — LANCE LE SYNTH DEMO</div>
+        <div class="ls-credit">MUSIQUES : KEVIN MACLEOD — CC-BY (INCOMPETECH)</div>
+      </div>
+
+      <div id="cursor" class="hidden">
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <div class="dot"></div>
+        <div class="charge"></div>
+      </div>
+      <div id="cursor2" class="hidden">
+        <div class="ring r1"></div>
+        <div class="dot"></div>
+      </div>
+
+      <div id="help">
+        ✋ DÉPLACER = TOURNER LE GLOBE &nbsp;·&nbsp; 🤏🤏 ÉCARTER/RAPPROCHER = ZOOM &nbsp;·&nbsp; 🤏 PINCER UN POINT = PLONGER
+      </div>
+
+      <div id="flash"></div>
+      <div id="scanlines"></div>
+    </div>
+
+  </body>
+</html>
