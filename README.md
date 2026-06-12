@@ -1,9 +1,18 @@
-# J.A.R.V.I.S — Holographic Interface
+# J.A.R.V.I.S Holographic Interface
 
 Interface holographique 3D contrôlée par la reconnaissance des mains en temps réel.
 Inspirée de l'esthétique Jarvis d'Iron Man.
 
 Démo en ligne : **https://jarvis-lyart-tau.vercel.app**
+
+![Three.js](https://img.shields.io/badge/Three.js-r170-black?style=flat&logo=threedotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?style=flat&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=flat&logo=vite&logoColor=white)
+![MediaPipe](https://img.shields.io/badge/MediaPipe-0.10.14-0097A7?style=flat&logo=google&logoColor=white)
+![WebGL](https://img.shields.io/badge/WebGL-2.0-990000?style=flat&logo=webgl&logoColor=white)
+![Web Audio API](https://img.shields.io/badge/Web%20Audio%20API-native-FF6B35?style=flat)
+![OpenStreetMap](https://img.shields.io/badge/OpenStreetMap-Overpass-7EBC6F?style=flat&logo=openstreetmap&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-deployed-000000?style=flat&logo=vercel&logoColor=white)
 
 ---
 
