@@ -89,6 +89,11 @@ export class MapWorld implements World {
   private trans: Transition | null = null;
   private transKey = '';
   private flashEl = document.getElementById('flash')!;
+  private loaderEl = document.getElementById('loader');
+  private loaderTextEl = document.getElementById('loader-text');
+  // loader 3D (casque : le DOM n'apparaît pas dans la vue VR)
+  private loader3d!: THREE.Group;
+  private loaderRing!: THREE.Mesh;
   private onStatus: (text: string, kind?: StatusKind) => void;
 
   constructor(
@@ -105,6 +110,7 @@ export class MapWorld implements World {
     );
 
     this.buildGlobe();
+    this.buildLoader3D();
     void this.loadContinents(); // asynchrone, le globe vit sans
 
     this.composer = makeBloomComposer(renderer, this.scene, this.camera, {
@@ -113,6 +119,42 @@ export class MapWorld implements World {
       threshold: 0.2,
     });
     this.updateCamera();
+  }
+
+  /**
+   * Indicateur de chargement 3D, enfant de la caméra (donc dans le rig en VR) :
+   * un anneau qui tourne + un libellé, affichés devant la tête pendant la
+   * plongée. Indispensable au casque, où l'écran de chargement DOM est invisible.
+   */
+  private buildLoader3D(): void {
+    const grp = new THREE.Group();
+    grp.position.set(0, 0, -1.4);
+    grp.visible = false;
+
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(0.16, 0.013, 8, 40, Math.PI * 1.5),
+      new THREE.MeshBasicMaterial({
+        color: CYAN,
+        transparent: true,
+        opacity: 0.9,
+        depthTest: false,
+      }),
+    );
+    ring.renderOrder = 999;
+    grp.add(ring);
+    this.loaderRing = ring;
+
+    const label = this.makeLabel('CHARGEMENT…');
+    label.scale.set(0.95, 0.24, 1);
+    label.position.set(0, -0.3, 0);
+    const lm = label.material as THREE.SpriteMaterial;
+    lm.depthTest = false;
+    lm.opacity = 0.9;
+    label.renderOrder = 999;
+    grp.add(label);
+
+    this.camera.add(grp);
+    this.loader3d = grp;
   }
 
   get hoveredCityName(): string | null {
@@ -417,8 +459,10 @@ export class MapWorld implements World {
       }
     });
 
-    // pincer un point = plonger vers la ville
-    if (g.grabStart && this.hoveredCity) this.select(this.hoveredCity);
+    // viser un point puis valider = plonger vers la ville. Mains nues / tactile :
+    // la pince (grabStart). Manettes VR : la gâchette avant (fireLeft/fireRight).
+    const select = g.grabStart || g.fireLeft === true || g.fireRight === true;
+    if (select && this.hoveredCity) this.select(this.hoveredCity);
   }
 
   private select(key: string): void {
@@ -444,6 +488,8 @@ export class MapWorld implements World {
     this.transKey = key;
     this.state = 'transition';
     this.onStatus(`PLONGÉE VERS ${CITIES[key].name}…`);
+    // voile de chargement dès la sélection (le fetch Overpass démarre maintenant)
+    this.setLoading(true, CITIES[key].name);
 
     this.city
       .load(key)
@@ -462,6 +508,7 @@ export class MapWorld implements World {
     this.trans = null;
     this.radius = 340;
     this.zoomVel = 0;
+    this.setLoading(false);
     this.flash();
     this.onStatus('ALL SYSTEMS OPERATIONAL', 'ready');
   }
@@ -471,11 +518,27 @@ export class MapWorld implements World {
     setTimeout(() => this.flashEl.classList.remove('on'), 420);
   }
 
+  /** Voile de chargement (DOM) affiché tant que la ville n'est pas prête, pour
+   *  ne pas laisser la plongée figée sur le zoom. Sans effet en VR (panneau 3D). */
+  private setLoading(on: boolean, name = ''): void {
+    // DOM : web / mobile hors VR
+    if (this.loaderEl) {
+      if (on && this.loaderTextEl) {
+        this.loaderTextEl.textContent = name ? `CHARGEMENT · ${name}` : 'CHARGEMENT…';
+      }
+      this.loaderEl.classList.toggle('hidden', !on);
+    }
+    // 3D : visible dans le casque (le DOM ne l'est pas)
+    this.loader3d.visible = on;
+  }
+
   // ---------------------------------------------------------------- render
 
   render(): void {
     const dt = Math.min(this.clock.getDelta(), 0.05);
     const t = this.clock.elapsedTime;
+
+    if (this.loader3d.visible) this.loaderRing.rotation.z -= dt * 4;
 
     if (this.state === 'city') {
       this.city.render();
@@ -510,11 +573,13 @@ export class MapWorld implements World {
       this.updateCamera();
 
       if (tr.failed) {
+        this.setLoading(false);
         this.trans = null;
         this.state = 'globe';
         this.radius = 340;
         this.onStatus('ÉCHEC DU CHARGEMENT DE LA VILLE', 'error');
       } else if (tr.t >= tr.dur && tr.loaded) {
+        this.setLoading(false);
         this.flash();
         this.city.enterCinematic();
         this.trans = null;
@@ -522,8 +587,12 @@ export class MapWorld implements World {
         this.onStatus(`${CITIES[this.transKey].name} · EN LIGNE`, 'ready');
         this.city.render();
         return;
+      } else if (tr.t >= tr.dur) {
+        // ville pas encore chargée : légère rotation pour que la scène derrière
+        // le voile ne paraisse pas figée sur le zoom le temps d'Overpass
+        this.theta += dt * 0.12;
+        this.updateCamera();
       }
-      // si la ville n'est pas encore chargée, la caméra reste en orbite basse
     }
 
     xrRender(this.renderer, this.composer, this.scene, this.camera);

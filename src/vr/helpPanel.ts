@@ -29,6 +29,7 @@ const WORLD_HELP: Record<string, HelpLine[]> = {
     ['STICK GAUCHE ↕', 'AVANCER / RECULER'],
     ['STICK DROIT ↕', 'ZOOM'],
     ['2 GÂCHETTES + ÉCARTER', 'ZOOM'],
+    ['GÂCHETTE', 'PLONGER SUR LE POINT VISÉ'],
     ['GRIP', 'PINCER / PLONGER SUR UN POINT'],
     ['GÂCHETTE EN VILLE', 'RETOUR AU GLOBE'],
     ['CLIC STICK GAUCHE', 'MODE SPIDER-MAN (ON/OFF)'],
