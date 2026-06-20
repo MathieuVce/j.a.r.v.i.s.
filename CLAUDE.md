@@ -39,6 +39,8 @@ Principe : **agir, se vérifier so i-même, ne demander que les vrais choix prod
 - **Convention de commit :** appliquer strictement la spécification _Conventional Commits_. Tous les messages doivent être en **anglais**, clairs et concis.
   - Format : `<type>(<scope>): <short description>` (ex. `feat(auth): add biometrics login support via TurboModule`).
   - Types autorisés : `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`.
+- **Jamais de trailer `Co-Authored-By` dans les messages de commit** (ni aucune mention d'assistant). Les messages restent purement Conventional Commits.
+- **Corps de PR :** pas d'emojis, pas de footer « Generated with Claude Code » ni mention d'assistant, pas de section « Vérifs »/checklist. Phrases simples et directes : contexte puis changements, rien de plus.
 - Un hook **pre-commit** (husky + lint-staged) formate/lint les fichiers stagés automatiquement — pas besoin de formater à la main avant de committer.
 - Push sur `main` = **déploiement Vercel automatique** : ne pousser sur `main` qu'à la demande explicite de l'utilisateur.
 
