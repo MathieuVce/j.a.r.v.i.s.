@@ -5,6 +5,12 @@ node_modules/
 dist/
 dist-ssr/
 
+# Playwright (smoke test non-VR)
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
 # Vite / cache
 .vite/
 *.local
@@ -16,6 +22,9 @@ dist-ssr/
 
 # Vercel
 .vercel/
+
+# Claude Code : config perso locale (le settings.json partagé reste versionné)
+.claude/settings.local.json
 
 # éditeurs
 .vscode/*

@@ -5,16 +5,46 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:vr": "vite --mode vr --host",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test:e2e": "playwright test tests/smoke.spec.ts",
+    "test:visual": "playwright test tests/visual.spec.ts",
+    "test:visual:update": "playwright test tests/visual.spec.ts --update-snapshots",
+    "check": "npm run lint && npm run build && npm run test:e2e",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,mjs,json,css,md,html}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "0.10.14",
     "three": "^0.170.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
+    "@playwright/test": "^1.61.0",
     "@types/three": "^0.170.0",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "eslint": "^10.5.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.6.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "prettier": "^3.8.4",
     "typescript": "^5.6.0",
+    "typescript-eslint": "^8.61.1",
     "vite": "^6.0.0"
   }
 }

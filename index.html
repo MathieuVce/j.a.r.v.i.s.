@@ -2,9 +2,13 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="theme-color" content="#02060c" />
     <title>J.A.R.V.I.S</title>
-    <link rel="stylesheet" href="/src/style.css" />
+    <link rel="stylesheet" href="/src/styles/style.css" />
   </head>
   <body>
     <div id="cam-feed">
@@ -30,18 +34,31 @@
       <div id="world-controls">
         <button id="world-toggle">MONDE&nbsp;:&nbsp;CARTE</button>
         <button id="globe-back" class="hidden">◉ RETOUR GLOBE</button>
+        <button id="vr-toggle" class="hidden">◎ LANCER EN VR</button>
       </div>
 
       <div id="ls-panel" class="hidden">
         <div class="ls-title">◉ AUDIO REACTOR</div>
         <div class="ls-row">
           <button id="ls-demo">SYNTH DEMO</button>
-          <button class="ls-track" data-name="PYRO FLOW — K. MACLEOD"
-            data-url="https://archive.org/download/Kevin-MacLeod_Vicious_2016_FullAlbum/Vicious/Kevin%20MacLeod%20-%2001%20-%20Pyro%20Flow.mp3">PYRO FLOW</button>
-          <button class="ls-track" data-name="VICIOUS — K. MACLEOD"
-            data-url="https://archive.org/download/Kevin-MacLeod_Vicious_2016_FullAlbum/Vicious/Kevin%20MacLeod%20-%2002%20-%20Vicious.mp3">VICIOUS</button>
+          <button
+            class="ls-track"
+            data-name="PYRO FLOW — K. MACLEOD"
+            data-url="https://archive.org/download/Kevin-MacLeod_Vicious_2016_FullAlbum/Vicious/Kevin%20MacLeod%20-%2001%20-%20Pyro%20Flow.mp3"
+          >
+            PYRO FLOW
+          </button>
+          <button
+            class="ls-track"
+            data-name="VICIOUS — K. MACLEOD"
+            data-url="https://archive.org/download/Kevin-MacLeod_Vicious_2016_FullAlbum/Vicious/Kevin%20MacLeod%20-%2002%20-%20Vicious.mp3"
+          >
+            VICIOUS
+          </button>
         </div>
-        <label id="ls-upload">⬆ UPLOADER MP3/WAV<input id="ls-file" type="file" accept="audio/*"></label>
+        <label id="ls-upload"
+          >⬆ UPLOADER MP3/WAV<input id="ls-file" type="file" accept="audio/*"
+        /></label>
         <div class="ls-row" id="ls-ambs">
           <button data-amb="neon" class="on">NÉON</button>
           <button data-amb="space">SPACE</button>
@@ -67,7 +84,8 @@
       </div>
 
       <div id="help">
-        ✋ DÉPLACER = TOURNER LE GLOBE &nbsp;·&nbsp; 🤏🤏 ÉCARTER/RAPPROCHER = ZOOM &nbsp;·&nbsp; 🤏 PINCER UN POINT = PLONGER
+        ✋ DÉPLACER = TOURNER LE GLOBE &nbsp;·&nbsp; 🤏🤏 ÉCARTER/RAPPROCHER = ZOOM &nbsp;·&nbsp; 🤏
+        PINCER UN POINT = PLONGER
       </div>
 
       <div id="flash"></div>

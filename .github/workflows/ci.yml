@@ -1,0 +1,40 @@
+name: CI
+
+# Barrière anti-régression : lint + build (tsc + vite) + smoke test non-VR.
+# IMPORTANT : ce workflow ne DÉPLOIE rien. Le déploiement est géré par
+# l'intégration Git de Vercel (push sur `main`). On se contente de valider.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# annule les runs périmés sur une même ref (push rapides successifs)
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build (tsc --noEmit + vite build)
+        run: npm run build
+
+      - name: Install Playwright (chromium)
+        run: npx playwright install --with-deps chromium
+
+      - name: Smoke test (non-VR)
+        run: npm run test:e2e

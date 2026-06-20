@@ -18,30 +18,66 @@ Démo en ligne : **https://jarvis-lyart-tau.vercel.app**
 
 ## Vue d'ensemble
 
-J.A.R.V.I.S est une application web immersive qui utilise la caméra frontale pour détecter les mains de l'utilisateur via MediaPipe HandLandmarker.
-Les gestes pilotent en temps réel trois univers 3D distincts rendus avec Three.js : un globe terrestre interactif, un système solaire explorable et un réacteur audio visuel.
+J.A.R.V.I.S est une application web immersive qui se pilote par les mains, via trois sources d'entrée interchangeables :
+la **webcam** (détection des mains MediaPipe HandLandmarker), le **tactile** sur mobile, ou les **manettes / mains d'un casque VR** (WebXR).
+Les gestes pilotent en temps réel trois mondes 3D rendus avec Three.js : un globe terrestre / ville interactive, un système solaire explorable, et un réacteur audio-visuel doublé d'une batterie VR jouable.
 Tout fonctionne côté client, sans backend, sans clé API payante.
 
 ---
 
 ## Architecture générale
 
+`main.ts` orchestre tout : une boucle de rendu unique (`renderer.setAnimationLoop`, requise en WebXR),
+un registre de mondes uniformisés par l'interface `World`, et le choix de la source d'entrée selon le
+contexte (manettes/mains VR, tactile mobile, ou webcam). Chaque monde a sa scène, sa caméra et son
+`EffectComposer` (bloom). Le `WebGLRenderer` Three.js est **partagé** par tous les mondes.
+
 ```
 src/
-  main.ts        orchestrateur principal, boucle de rendu partagée
-  tracking.ts    capture webcam + inférence MediaPipe (GPU)
-  gestures.ts    moteur de gestes, modèle joystick + deux mains
-  globe.ts       monde Carte : globe terrestre, villes, plongée cinématique
-  city.ts        monde Ville : bâtiments OSM en 3D, navigation piétonne
-  scene.ts       monde Univers : système solaire, planètes attrapables
-  lightshow.ts   monde Light Show : réacteur audio, particules vivantes
-  music.ts       moteur audio : FFT, détection de beat, lecture fichier/URL
-  hud.ts         interface HUD : curseurs, labels, panneau Audio Reactor
-  audio.ts       sons UI Jarvis (blips, whoosh, transitions)
-  style.css      esthétique holographique cyan/ambre
+  main.ts                  orchestrateur : boucle de rendu, registre des mondes, câblage HUD/audio/VR
+  utils/
+    world.ts               interface World { update -> WorldFrame; render; resize; deactivate? } — contrat des mondes
+    math.ts · composer.ts · textures.ts · palette.ts   helpers partagés (bloom, bruit, couleurs)
+
+  input/                   produisent tous un GestureState unifié
+    tracking.ts            capture webcam + inférence MediaPipe (GPU)
+    gestures.ts            landmarks -> gestes (modèle joystick, deux mains, pince/poing/paume)
+    touch.ts               fallback tactile mobile
+    xrinput.ts             manettes / mains WebXR (+ remplit l'état partagé des mains)
+
+  vr/                      couche WebXR (barrel : vr/index.ts)
+    state.ts               xrHandState : pos/quat/pince/poing/manettes partagés
+    session.ts             démarrage de la session XR     rig.ts     ancrage espace local-floor
+    render.ts              composition du rendu VR + visée  hands.ts   marqueurs de mains / lasers
+    helpPanel.ts           panneau d'aide 3D (contrôles par monde)
+
+  worlds/
+    map/                   monde Carte
+      globe.ts             globe terrestre, villes, plongée cinématique (entrée du monde)
+      city.ts              ville OSM 3D (bâtiments Overpass), navigation piétonne
+      cityDecor.ts         décors de ville
+      spiderMode.ts        mode Spider-Man (déplacement / toile / saut)
+    universe/              monde Univers
+      Universe.ts          système solaire : planètes attrapables, orbites, sauts inter-sites
+      build.ts             construction du Soleil et des planètes
+    lightshow/             monde Light Show
+      lightshow.ts         réacteur audio-visuel (particules, barres, structure) + intègre la batterie
+      drums.ts             batterie VR : baguettes = manettes, fûts, sons synthétisés
+      rhythm/              mode jeu « Drum Hero » : chart.ts · game.ts · highway.ts · scorePanel.ts
+
+  components/
+    planets.ts             specs du système solaire, matériaux / atmosphères / anneaux
+    cosmos.ts              galaxies, trou noir, ceinture, étoiles, comètes
+  audio/
+    music.ts               moteur musique : FFT, détection de beat, lecture fichier/URL
+    audio.ts               sons UI Jarvis (blips, whoosh, transitions)
+  screens/hud.ts           HUD : curseurs, labels, panneau Audio Reactor, ordre des mondes
+  styles/style.css         esthétique holographique cyan/ambre
 ```
 
-Le `WebGLRenderer` Three.js est **partagé** entre tous les mondes. Chaque monde possède sa propre scène, sa caméra et son `EffectComposer` (bloom post-processing). On commute de monde en cliquant sur le bouton en haut à droite ou en lançant le geste correspondant.
+**Ajouter un monde** = implémenter l'interface `World` (`utils/world.ts`), l'enregistrer dans le registre
+`worlds` de `main.ts`, et l'ajouter à `WORLD_ORDER` / `WORLD_SHORT` (`screens/hud.ts`). On commute de monde
+via le bouton en haut à droite, le geste correspondant, ou les boutons A/B des manettes en VR.
 
 ---
 
@@ -57,7 +93,7 @@ MediaPipe Tasks Vision 0.10.14. Le modèle `hand_landmarker.task` est chargé de
 Inférence GPU via le délégué WebGL, 2 mains simultanées, 21 landmarks chacune, mode VIDEO (flux continu).
 Le canvas de debug en bas à droite affiche le squelette miroir en temps réel.
 
-**Moteur de gestes** (`gestures.ts`)
+**Moteur de gestes** (`input/gestures.ts`)
 Les positions brutes des landmarks sont lissées par exponential smoothing (α = 0.4).
 Le joystick est basé sur la **position absolue** de la main par rapport au centre de l'écran, pas sur un delta frame-à-frame. Cela élimine l'amplification du bruit de tracking.
 Le zoom utilise le **ratio logarithmique** de la distance inter-mains entre deux frames consécutives : on peut répéter le geste sans effet de rebond.
@@ -79,9 +115,9 @@ Vite 6, TypeScript 5.6 strict (`noUnusedLocals`, `noUnusedParameters`). Zéro fr
 
 ---
 
-## Les trois scènes
+## Les mondes
 
-### 1. Globe terrestre (scène par défaut)
+### 1. Globe terrestre (monde par défaut)
 
 Un globe 3D translucide représente la Terre avec les contours des pays en lignes cyan à la Jarvis.
 Des marqueurs pulsants indiquent des villes emblématiques.
@@ -96,6 +132,7 @@ La navigation se fait main ouverte : haut/bas pour avancer/reculer, gauche/droit
 Pincer et tirer déplace latéralement sur le plan au sol.
 Deux pinces contrôlent l'altitude.
 Maintenir le poing fermé pendant 1,2 secondes charge la bulle ambre autour du curseur et déclenche le retour au globe.
+En VR, un **mode Spider-Man** (`worlds/map/spiderMode.ts`) permet de se déplacer dans la ville, lancer des toiles et sauter à la première personne.
 
 ### 3. Univers / Système solaire
 
@@ -122,20 +159,26 @@ tourbillon orbital (orbites individuelles accélérées par les médiums), pluie
 3 ambiances : Néon (magenta/sarcelle), Space (bleu nuit/violet), Minimal (gris/blanc).
 Bloom : strength 0.7, threshold 0.32 — halo présent sans écraser les couleurs sombres.
 
+**Batterie VR** (`worlds/lightshow/drums.ts`) : en session immersive, les manettes deviennent des baguettes et un kit néon (caisse claire, toms, charley, crash, ride, grosse caisse) se pose devant le joueur. Chaque frappe joue un son synthétisé (Web Audio) et alimente les effets du light show. La gâchette sert de pédale de grosse caisse, le stick gauche règle la hauteur / profondeur du kit ; chaque fût a sa couleur propre.
+
+**Drum Hero** (`worlds/lightshow/rhythm/`) : un mode jeu rythme façon Guitar Hero — des gemmes descendent une autoroute de voies colorées (une par fût) jusqu'à la ligne de frappe, et les coups sont notés (perfect / good / miss).
+
 ---
 
 ## Gestes globaux
 
-| Geste | Action |
-|---|---|
-| Main ouverte excentrée | Joystick orbite / navigation / lumière |
-| Deux mains pincées écartées | Zoom avant |
-| Deux mains pincées rapprochées | Zoom arrière |
-| Pincer | Attraper / sélectionner / intensité lumière |
-| Poing maintenu (1,2 s) | Retour au globe depuis la vue ville |
-| ✌️ en Light Show | Changer de palette de couleurs |
-| 🤟 en Light Show | Changer de forme + comportement particules |
-| 2e main ouverte en Light Show | Joystick caméra |
+| Geste                          | Action                                      |
+| ------------------------------ | ------------------------------------------- |
+| Main ouverte excentrée         | Joystick orbite / navigation / lumière      |
+| Deux mains pincées écartées    | Zoom avant                                  |
+| Deux mains pincées rapprochées | Zoom arrière                                |
+| Pincer                         | Attraper / sélectionner / intensité lumière |
+| Poing maintenu (1,2 s)         | Retour au globe depuis la vue ville         |
+| ✌️ en Light Show               | Changer de palette de couleurs              |
+| 🤟 en Light Show               | Changer de forme + comportement particules  |
+| 2e main ouverte en Light Show  | Joystick caméra                             |
+
+En VR, les contrôles manettes (sticks, gâchettes, boutons A/B/X/Y) sont spécifiques à chaque monde et rappelés en jeu par le **panneau d'aide** (`vr/helpPanel.ts`), affichable avec les boutons X/Y.
 
 ---
 
