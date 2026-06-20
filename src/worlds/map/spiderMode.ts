@@ -68,10 +68,12 @@ const DUAL_RELEASE_BOOST = 8; // propulsion avant au lâcher des deux toiles
 
 // --- escalade au mur (wall climbing) ---
 const GRAB_REACH = 1.5; // distance main↔façade pour s'accrocher (u) — généreuse
-const CLIMB_GAIN = 1.8; // amplification du hissage (super héros : la main soulève fort)
-const WALL_LEAP = 28; // u/s : vitesse de projection au saut depuis le mur
-const WALL_LEAP_UP = 7; // u/s : composante verticale ajoutée à la projection
-const CLIMB_RELEASE_BOOST = 1.4; // multiplie l'élan du corps quand on lâche en tirant
+const CLIMB_GAIN = 1.9; // amplification du hissage. Borne DURE : doit rester < 2,
+// sinon le système diverge (handWorld = pos + feet → déplacer feet déplace la
+// main d'autant ; gain ≥ 2 = oscillation et la main décroche). 1.9 = max stable.
+const WALL_LEAP = 46; // u/s : vitesse de projection au saut depuis le mur
+const WALL_LEAP_UP = 12; // u/s : composante verticale ajoutée à la projection
+const CLIMB_RELEASE_BOOST = 2; // multiplie l'élan du corps quand on lâche en tirant
 
 // --- collision ---
 const CELL = 80; // taille de cellule de la grille de pruning
@@ -505,7 +507,7 @@ export class SpiderMode {
         this.vel.y += WALL_LEAP_UP;
         _tangent.set(0, 0, 0);
         for (let i = 0; i < 2; i++) if (this.gripAnchor[i]) _tangent.add(this.gripNormal[i]);
-        if (_tangent.lengthSq() > 1e-6) this.vel.addScaledVector(_tangent.normalize(), 4);
+        if (_tangent.lengthSq() > 1e-6) this.vel.addScaledVector(_tangent.normalize(), 7);
         this.gripAnchor = [null, null];
         this.grounded = false;
         this.jumpsUsed = 1; // un saut aérien reste possible après la projection
@@ -703,9 +705,12 @@ export class SpiderMode {
       if (this.feet.y < 0) this.feet.y = 0;
       this.climbVel.set((mx * k) / dt, (my * k) / dt, (mz * k) / dt);
       if (this.climbVel.length() > MAX_SPEED) this.climbVel.setLength(MAX_SPEED);
-    } else {
-      this.climbVel.set(0, 0, 0);
     }
+    // NB : on NE remet PAS climbVel à zéro quand aucune main n'est accrochée. La
+    // frame du lâcher a grip=false (donc n=0) mais le boost de lâcher
+    // (CLIMB_RELEASE_BOOST) a besoin de l'élan de hissage de la frame précédente
+    // pour te projeter vers une nouvelle prise (gauche / droite / haut) au seul
+    // geste de la main, sans appuyer sur A.
   }
 
   /** Orientation monde de la tête : yaw de vue ∘ pose casque (espace réf). */
